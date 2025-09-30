@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metric-Imperial Converter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .converter-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fff;
+            color: #333;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .convert-btn:active {
+            transform: translateY(0);
+        }
+
+        .convert-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .convert-btn:hover::before {
+            left: 100%;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9ff, #e8f2ff);
+            border-radius: 15px;
+            border: 1px solid #e1e5e9;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-header h3 {
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .conversion-result {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #fcc;
+            margin-top: 20px;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .examples {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+        }
+
+        .examples h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .example-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .example-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e1e5e9;
+            font-size: 0.9rem;
+        }
+
+        .example-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .example-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-exchange-alt"></i> Metric-Imperial Converter</h1>
+            <p>Convert between metric and imperial units with ease</p>
+        </div>
+
+        <div class="converter-section">
+            <div class="input-group">
+                <label for="input">Enter value and unit (e.g., 10L, 5.5gal, 3/4mi)</label>
+                <div class="input-wrapper">
+                    <input type="text" id="input" class="input-field" placeholder="Enter value and unit..." autocomplete="off">
+                </div>
+            </div>
+
+            <button class="convert-btn" onclick="convert()">
+                <i class="fas fa-calculator"></i> Convert
+            </button>
+
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Converting...</p>
+            </div>
+
+            <div class="error-message" id="error"></div>
+        </div>
+
+        <div class="result-section" id="result">
+            <div class="result-header">
+                <h3>Conversion Result</h3>
+            </div>
+            <div class="conversion-result">
+                <div class="result-item">
+                    <span class="result-label">Input:</span>
+                    <span class="result-value" id="initNum">-</span>
+                    <span class="result-value" id="initUnit">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Output:</span>
+                    <span class="result-value" id="returnNum">-</span>
+                    <span class="result-value" id="returnUnit">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Conversion:</span>
+                    <span class="result-value" id="string">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="examples">
+            <h4><i class="fas fa-lightbulb"></i> Try these examples:</h4>
+            <div class="example-list">
+                <div class="example-item" onclick="setExample('10L')">10L (liters to gallons)</div>
+                <div class="example-item" onclick="setExample('5.5gal')">5.5gal (gallons to liters)</div>
+                <div class="example-item" onclick="setExample('3/4mi')">3/4mi (miles to kilometers)</div>
+                <div class="example-item" onclick="setExample('32lbs')">32lbs (pounds to kilograms)</div>
+                <div class="example-item" onclick="setExample('10kg')">10kg (kilograms to pounds)</div>
+                <div class="example-item" onclick="setExample('5km')">5km (kilometers to miles)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setExample(value) {
+            document.getElementById('input').value = value;
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        async function convert() {
+            const input = document.getElementById('input').value.trim();
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.querySelector('.loading');
+
+            if (!input) {
+                errorDiv.textContent = 'Please enter a value to convert';
+                errorDiv.style.display = 'block';
+                resultDiv.style.display = 'none';
+                return;
+            }
+
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+
+            try {
+                const response = await fetch(`/api/convert?input=${encodeURIComponent(input)}`);
+                const data = await response.json();
+
+                loadingDiv.style.display = 'none';
+
+                if (data.error) {
+                    let errorMessage = '';
+                    switch(data.error) {
+                        case 'invalid number':
+                            errorMessage = 'Invalid number format. Please check your input.';
+                            break;
+                        case 'invalid unit':
+                            errorMessage = 'Invalid unit. Valid units are: gal, L, lbs, kg, mi, km';
+                            break;
+                        case 'invalid number and unit':
+                            errorMessage = 'Both number and unit are invalid. Please check your input.';
+                            break;
+                        default:
+                            errorMessage = data.error;
+                    }
+                    errorDiv.textContent = errorMessage;
+                    errorDiv.style.display = 'block';
+                } else {
+                    document.getElementById('initNum').textContent = data.initNum;
+                    document.getElementById('initUnit').textContent = data.initUnit;
+                    document.getElementById('returnNum').textContent = data.returnNum;
+                    document.getElementById('returnUnit').textContent = data.returnUnit;
+                    document.getElementById('string').textContent = data.string;
+                    resultDiv.style.display = 'block';
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                errorDiv.style.display = 'block';
+                console.error('Conversion error:', error);
+            }
+        }
+
+        document.getElementById('input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                convert();
+            }
+        });
+
+        document.getElementById('input').addEventListener('input', function() {
+            document.getElementById('error').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
