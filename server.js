@@ -24,14 +24,26 @@ app.get('/', (req, res) => {
 // Test runner endpoint for FreeCodeCamp
 app.get('/_api/get-tests', (req, res) => {
   console.log('Running tests for FreeCodeCamp...');
-  const { exec } = require('child_process');
+  const { spawn } = require('child_process');
   
-  exec('npm test', { env: { ...process.env, NODE_ENV: 'test' } }, (error, stdout, stderr) => {
-    if (error && !stdout.includes('passing')) {
-      console.error('Test execution error:', error);
-      return res.json({ error: 'Failed to run tests', details: stderr });
-    }
-    
+  // Use spawn instead of exec to handle the running server
+  const testProcess = spawn('npm', ['test'], {
+    env: { ...process.env, NODE_ENV: 'test' },
+    shell: true
+  });
+  
+  let stdout = '';
+  let stderr = '';
+  
+  testProcess.stdout.on('data', (data) => {
+    stdout += data.toString();
+  });
+  
+  testProcess.stderr.on('data', (data) => {
+    stderr += data.toString();
+  });
+  
+  testProcess.on('close', (code) => {
     // Parse the test results
     const passingMatch = stdout.match(/(\d+) passing/);
     const failingMatch = stdout.match(/(\d+) failing/);
@@ -42,9 +54,18 @@ app.get('/_api/get-tests', (req, res) => {
     res.json({
       passed: passing,
       failed: failing,
+      tests: passing + failing,
       output: stdout
     });
   });
+  
+  // Timeout after 30 seconds
+  setTimeout(() => {
+    testProcess.kill();
+    if (!res.headersSent) {
+      res.json({ error: 'Test execution timeout' });
+    }
+  }, 30000);
 });
 
 app.use((req, res, next) => {
@@ -56,11 +77,12 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
-const listener = app.listen(PORT, () => {
-  console.log(`Your app is listening on port ${listener.address().port}`);
-  if (process.env.NODE_ENV !== 'test') {
+// Only start the server if not in test mode or if explicitly running
+if (process.env.NODE_ENV !== 'test' || require.main === module) {
+  const listener = app.listen(PORT, () => {
+    console.log(`Your app is listening on port ${listener.address().port}`);
     console.log('Ready for FreeCodeCamp validation!');
-  }
-});
+  });
+}
 
 module.exports = app;
