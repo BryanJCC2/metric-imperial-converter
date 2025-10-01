@@ -74,45 +74,12 @@ suite('Unit Tests', function() {
 
   suite('Function convertHandler.getReturnUnit(initUnit)', function() {
     
-    test('Return unit for gal', function(done) {
-      const input = 'gal';
-      const result = convertHandler.getReturnUnit(input);
-      assert.equal(result, 'L');
-      done();
-    });
-    
-    test('Return unit for L', function(done) {
-      const input = 'L';
-      const result = convertHandler.getReturnUnit(input);
-      assert.equal(result, 'gal');
-      done();
-    });
-    
-    test('Return unit for mi', function(done) {
-      const input = 'mi';
-      const result = convertHandler.getReturnUnit(input);
-      assert.equal(result, 'km');
-      done();
-    });
-    
-    test('Return unit for km', function(done) {
-      const input = 'km';
-      const result = convertHandler.getReturnUnit(input);
-      assert.equal(result, 'mi');
-      done();
-    });
-    
-    test('Return unit for lbs', function(done) {
-      const input = 'lbs';
-      const result = convertHandler.getReturnUnit(input);
-      assert.equal(result, 'kg');
-      done();
-    });
-    
-    test('Return unit for kg', function(done) {
-      const input = 'kg';
-      const result = convertHandler.getReturnUnit(input);
-      assert.equal(result, 'lbs');
+    test('Return correct return unit for each valid input unit', function(done) {
+      const inputs = ['gal', 'L', 'mi', 'km', 'lbs', 'kg'];
+      const expected = ['L', 'gal', 'km', 'mi', 'kg', 'lbs'];
+      inputs.forEach((input, i) => {
+        assert.equal(convertHandler.getReturnUnit(input), expected[i]);
+      });
       done();
     });
     
@@ -120,7 +87,7 @@ suite('Unit Tests', function() {
 
   suite('Function convertHandler.spellOutUnit(unit)', function() {
     
-    test('Spell out each valid input unit', function(done) {
+    test('Return spelled-out string unit for each valid input unit', function(done) {
       const inputs = ['gal', 'L', 'mi', 'km', 'lbs', 'kg'];
       const expected = ['gallons', 'liters', 'miles', 'kilometers', 'pounds', 'kilograms'];
       inputs.forEach((input, i) => {
